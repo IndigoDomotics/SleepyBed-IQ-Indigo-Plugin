@@ -1,0 +1,7 @@
+SLEEPYBED IQ INDIGO PLUGIN VERSION HISTORY
+==========================================
+
+1.0.0
+* Initial release.  Supports SleepNumber beds in the SleepIQ online sleep tracking system.
+--
+

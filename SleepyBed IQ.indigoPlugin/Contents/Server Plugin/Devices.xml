@@ -1,0 +1,133 @@
+<?xml version="1.0"?>
+<Devices>
+	<Device type="sensor" id="sleepNumberBed">
+		<Name>SleepNumber Bed</Name>
+		<ConfigUI>
+			<Field id="accountId" type="textfield" hidden="true" defaultValue="" />
+			<Field id="address" type="textfield" hidden="true" defaultValue="" />
+			<Field id="base" type="textfield" hidden="true" defaultValue="" />
+			<Field id="bedId" type="menu"
+				tooltip="Select a SleepNumber Bed">
+				<Label>SleepNumber Bed:</Label>
+				<List class="self" method="bedListGenerator" />
+			</Field>
+			<Field id="bedName" type="textfield" hidden="true" defaultValue="" />
+			<Field id="dualSleep" type="checkbox" hidden="true" defaultValue="false" />
+			<Field id="generation" type="textfield" hidden="true" defaultValue="" />
+			<Field id="isKidsBed" type="checkbox" hidden="true" defaultValue="false" />
+			<Field id="macAddress" type="textfield" hidden="true" defaultValue="" />
+			<Field id="model" type="textfield" hidden="true" defaultValue="" />
+			<Field id="purchaseDate" type="textfield" hidden="true" defaultValue="" />
+			<Field id="reference" type="textfield" hidden="true" defaultValue="" />
+			<Field id="registrationDate" type="textfield" hidden="true" defaultValue="" />
+			<Field id="returnRequestStatus" type="textfield" hidden="true" defaultValue="" />
+			<Field id="serial" type="textfield" hidden="true" defaultValue="" />
+			<Field id="size" type="textfield" hidden="true" defaultValue="" />
+			<Field id="sku" type="textfield" hidden="true" defaultValue="" />
+			<Field id="status" type="textfield" hidden="true" defaultValue="" />
+			<Field id="timeZone" type="textfield" hidden="true" defaultValue="" />
+			<Field id="version" type="textfield" hidden="true" defaultValue="" />
+			<Field id="zipCode" type="textfield" hidden="true" defaultValue="" />
+			<!-- Indigo native properties -->
+			<Field id="SupportsOnState" type="checkbox" hidden="true" defaultValue="true" />
+			<Field id="SupportsSensorValue" type="checkbox" hidden="true" defaultValue="false" />
+			<Field id="SupportsStatusRequest" type="checkbox" hidden="true" defaultValue="true" />
+			<Field id="SupportsBatteryLevel" type="checkbox" hidden="true" defaultValue="false" />
+			<Field id="AllowOnStateChange" type="checkbox" hidden="true" defaultValue="false" />
+			<Field id="AllowSensorValueChange" type="checkbox" hidden="true" defaultValue="false" />
+		</ConfigUI>
+		<States>
+			<State id="anyoneInBed">
+				<ValueType>Boolean</ValueType>
+				<TriggerLabel>Either Side Occupied</TriggerLabel>
+				<ControlPageLabel>Either Side Occupied</ControlPageLabel>
+			</State>
+			<State id="everyoneInBed">
+				<ValueType>Boolean</ValueType>
+				<TriggerLabel>Both Sides Occupied</TriggerLabel>
+				<ControlPageLabel>Both Sides Occupied</ControlPageLabel>
+			</State>
+			<State id="leftIsInBed">
+				<ValueType>Boolean</ValueType>
+				<TriggerLabel>Left Side Occupied</TriggerLabel>
+				<ControlPageLabel>Left Side Occupied</ControlPageLabel>
+			</State>
+			<State id="rightIsInBed">
+				<ValueType>Boolean</ValueType>
+				<TriggerLabel>Right Side Occupied</TriggerLabel>
+				<ControlPageLabel>Right Side Occupied</ControlPageLabel>
+			</State>
+			<State id="leftPressure">
+				<ValueType>Integer</ValueType>
+				<TriggerLabel>Left Side Pressure</TriggerLabel>
+				<ControlPageLabel>Left Side Pressure</ControlPageLabel>
+			</State>
+			<State id="rightPressure">
+				<ValueType>Integer</ValueType>
+				<TriggerLabel>Right Side Pressure</TriggerLabel>
+				<ControlPageLabel>Right Side Pressure</ControlPageLabel>
+			</State>
+			<State id="leftSleepNumber">
+				<ValueType>Integer</ValueType>
+				<TriggerLabel>Left Side SleepNumber</TriggerLabel>
+				<ControlPageLabel>Left Side SleepNumber</ControlPageLabel>
+			</State>
+			<State id="rightSleepNumber">
+				<ValueType>Integer</ValueType>
+				<TriggerLabel>Right Side SleepNumber</TriggerLabel>
+				<ControlPageLabel>Left Side SleepNumber</ControlPageLabel>
+			</State>
+			<State id="leftSleeperId">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Left Side Sleeper ID</TriggerLabel>
+				<ControlPageLabel>Left Side Sleeper ID</ControlPageLabel>
+			</State>
+			<State id="rightSleeperId">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Right Side Sleeper ID</TriggerLabel>
+				<ControlPageLabel>Right Side Sleeper ID</ControlPageLabel>
+			</State>
+			<State id="leftSleeperName">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Name of Left Side Person</TriggerLabel>
+				<ControlPageLabel>Name of Left Side Person</ControlPageLabel>
+			</State>
+			<State id="rightSleeperName">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Name of Right Side Person</TriggerLabel>
+				<ControlPageLabel>Name of Right Side Person</ControlPageLabel>
+			</State>
+			<State id="leftSleepGoal">
+				<ValueType>Integer</ValueType>
+				<TriggerLabel>Left Side Sleep Goal (minutes)</TriggerLabel>
+				<ControlPageLabel>Left Side Sleep Goal (minutes)</ControlPageLabel>
+			</State>
+			<State id="rightSleepGoal">
+				<ValueType>Integer</ValueType>
+				<TriggerLabel>Left Side Sleep Goal (minutes)</TriggerLabel>
+				<ControlPageLabel>Left Side Sleep Goal (minutes)</ControlPageLabel>
+			</State>
+			<State id="leftAlertId">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Left Side Alert ID</TriggerLabel>
+				<ControlPageLabel>Left Side Alert ID</ControlPageLabel>
+			</State>
+			<State id="rightAlertId">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Right Side Alert ID</TriggerLabel>
+				<ControlPageLabel>Right Side Alert ID</ControlPageLabel>
+			</State>
+			<State id="leftAlertText">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Left Side Alert Text</TriggerLabel>
+				<ControlPageLabel>Left Side Alert Text</ControlPageLabel>
+			</State>
+			<State id="rightAlertText">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Right Side Alert Text</TriggerLabel>
+				<ControlPageLabel>Right Side Alert Text</ControlPageLabel>
+			</State>
+		</States>
+		<UiDisplayStateId>anyoneInBed</UiDisplayStateId>
+	</Device>
+</Devices>

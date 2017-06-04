@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<PluginConfig>
+	<SupportURL>http://www.nathansheldon.com/files/SleepyBed-IQ.php</SupportURL>
+	<Field id="title" type="label" alignText="center" fontColor="blue">
+		<Label>SleepyBed IQ Configuration</Label>
+	</Field>
+	<Field id="intro1" type="label" fontSize="small">
+		<Label>This plugin connects to Select Comfort's online SleepIQ system using the SleepIQ account information you provide below.  You'll need at least 1 SleepNumber bed with the SleepIQ feature and an active SleepIQ account.  Fill in the Username/Email and Password fields below then click the "Verify" button to verify your credentials.
+		</Label>
+	</Field>
+	<Field id="username" type="textfield" defaultValue=""
+		tooltip="The username (usually your email address) used to login to the SleepIQ web site.">
+		<Label>SleepIQ Username/Email:</Label>
+	</Field>
+	<Field id="labelUsername" type="label" alignWithControl="true" fontColor="darkgray" fontSize="small">
+		<Label>SleepIQ Username/Email (e.g. jdoe@example.com)</Label>
+	</Field>
+	<Field id="password" type="textfield" defaultValue="" secure="true"
+		tooltip="The password used to login to the SleepIQ web site.">
+		<Label>SleepIQ Password:</Label>
+	</Field>
+	<Field id="labelPassword" type="label" alignWithControl="true" fontColor="darkgray" fontSize="small">
+		<Label>SleepIQ web site password.</Label>
+	</Field>
+	<Field id="testLogin"
+			type="button"
+			tooltip="Click this button to test the above username and password with the SleepIQ web site.">
+		<Label>Verify Login:</Label>
+		<Title>Verify</Title>
+		<CallbackMethod>testLogin</CallbackMethod>
+    </Field>
+	<!-- Hidden menu used to enable or disable the accountVerifiedText lables. -->
+	<Field id="accountVerified" type="menu" defaultValue="unknown" hidden="true" >
+		<List>
+			<Option value="unknown">Unknown</Option>
+			<Option value="true">True</Option>
+			<Option value="false">False</Option>
+		</List>
+	</Field>
+	<Field id="accountVerifiedTextTrue" type="label" alignWithControl="true" fontSize="small" fontColor="blue" visibleBindingId="accountVerified" visibleBindingValue="true">
+		<Label>VERIFIED</Label>
+	</Field>
+	<Field id="accountVerifiedTextFalse" type="label" alignWithControl="true" fontSize="small" fontColor="red" visibleBindingId="accountVerified" visibleBindingValue="false">
+		<Label>FAILED</Label>
+	</Field>
+	<Field id="sep0" type="separator"/>
+	<Field id="updaterEmailsEnabled" type="checkbox" defaultValue="true"
+		tooltip="If you'd like to be notified via email when new versions of the Hue Lights plugin become available, enable this option.">
+		<Label>Enable Plugin Update Notifications:</Label>
+	</Field>
+	<Field id="noticeLabel" type="label" fontSize="small" fontColor="darkgray">
+		<Label>If you'd like to be notified via email when new versions of the Hue Lights plugin become available, enable this option.</Label>
+	</Field>
+	<Field id="updaterEmail" type="textfield" visibleBindingId="updaterEmailsEnabled" visibleBindingValue="true"
+		tooltip="Enter the email address at which you'd like to be notified of plugin version updates.">
+		<Label>Email Address:</Label>
+	</Field>
+	<Field id="emailLabel" type="label" alignWithControl="true" fontSize="small" fontColor="darkgray" visibleBindingId="updaterEmailsEnabled" visibleBindingValue="true">
+		<Label>Enter the email address at which you'd like to be notified of plugin version updates.</Label>
+	</Field>
+	<Field id="sep1" type="separator"/>
+	<Field id="debugLabel" type="label" fontColor="darkgray" fontSize="small">
+		<Label>If you are having problems with the plugin (or you are instructed by support), you can enable extra logging in the Event Log window by checking this button. Use with caution.
+		</Label>
+	</Field>
+	<Field id="showDebugInfo" type="checkbox"
+		tooltip="Enable debug logging in the Indigo log to view low level Hue Lights activity or if required for technical support. WARNING: There will be a lot of data. Don't leave debug logging enabled for too long.">
+		<Label>Enable debugging:</Label>
+		<Description>(not recommended)</Description>
+	</Field>
+	<Field id="sep2" type="separator"/>
+	<Field id="instructions0" type="label" fontColor="black" fontSize="small">
+		<Label>INSTRUCTION:</Label>
+	</Field>
+	<Field id="instructions1" type="label" fontColor="darkgray" fontSize="small">
+		<Label>This plugin requires that your SleepNumber bed be equiped with the SleepIQ feature, that the bed is connected to the SleepIQ web site and that you have an active account on the SleepIQ web site.</Label>
+	</Field>
+	<Field id="instructions2" type="label" fontColor="darkgray" fontSize="small">
+		<Label>Enter your SleepIQ username (which is usually your email address) in the "SleepIQ Username/Email" field then enter the password for that account in the "SleepIQ Password" field.  Click the Verify Login button to check if the username and password are working.  If they are, click the "Save" button below.</Label>
+	</Field>
+</PluginConfig>
