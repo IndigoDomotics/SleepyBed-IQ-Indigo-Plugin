@@ -1,0 +1,140 @@
+<?xml version="1.0"?>
+<Actions>
+	<SupportURL>http://www.nathansheldon.com/files/SleepyBed-IQ-Plugin.php</SupportURL>
+	<Action id="setSleepNumber" deviceFilter="self">
+		<Name>Set SleepNumber</Name>
+		<CallbackMethod>setSleepNumber</CallbackMethod>
+		<ConfigUI>
+			<Field id="side" type="menu" defaultValue="L" tooltip="Side of the bed">
+				<Label>Side:</Label>
+				<List>
+					<Option value="L">Left</Option>
+					<Option value="R">Right</Option>
+				</List>
+				<Description>Side of the bed</Description>
+			</Field>
+			<Field id="SleepNumber" type="textfield" tooltip="SleepNumber value">
+				<Label>SleepNumber:</Label>
+				<Description>SleepNumber value</Description>
+			</Field>
+			<Field id="label0" type="label" alignWithControl="true" fontColor="darkgray" fontSize="small">
+				<Label>Set a SleepNumber value from 0 to 100 in increments of 5.</Label>
+			</Field>
+			<Field id="caution0" type="label" fontColor="red" fontSize="small">
+				<Label>CAUTION:</Label>
+			</Field>
+			<Field id="caution1" type="label" fontColor="darkgray" fontSize="small">
+				<Label>Activating the SleepNumber pump when you are not in bed will result in an extremely stiff bed. Setting the SleepNumber should only be done when someone is laying on the side of the bed being adjusted.
+				</Label>
+			</Field>
+			<Field id="description" type="textfield" hidden="true">
+				<Label></Label>
+			</Field>
+		</ConfigUI>
+	</Action>
+	
+	<Action id="setBasePosition" deviceFilter="self">
+		<Name>Set Head or Foot Position</Name>
+		<CallbackMethod>setBasePosition</CallbackMethod>
+		<ConfigUI>
+			<Field id="notice0" type="label" fontSize="small" fontColor="darkgray">
+				<Label>Note that this action will only work on beds that support changing head or foot positions. Beds that only support changing the head position will ignore attempts to change the foot position.</Label>
+			</Field>
+			<Field id="side" type="menu" defaultValue="L" tooltip="Side of the bed">
+				<Label>Side:</Label>
+				<List>
+					<Option value="L">Left</Option>
+					<Option value="R">Right</Option>
+				</List>
+				<Description>Side of the bed</Description>
+			</Field>
+			<Field id="headOrFoot" type="menu" defaultValue="H" tooltip="Head or foot of the bed">
+				<Label>Head or Foot:</Label>
+				<List>
+					<Option value="H">Head</Option>
+					<Option value="F">Foot</Option>
+				</List>
+				<Description>Head or foot of the bed</Description>
+			</Field>
+			<Field id="basePosition" type="textfield" tooltip="Percent raised between 0 (flat) and 100 (fully raised)">
+				<Label>Percent Raised:</Label>
+				<Description>Percent raised between 0 and 100</Description>
+			</Field>
+			<Field id="label0" type="label" alignWithControl="true" fontColor="darkgray" fontSize="small">
+				<Label>Set how high you want the head or foot raised from 0 (flast) to 100 (fully raised).</Label>
+			</Field>
+			<Field id="speed" type="menu" defaultValue="0">
+				<Label>Speed:</Label>
+				<List>
+					<Option value="0">Fast</Option>
+					<Option value="1">Slow</Option>
+				</List>
+				<Description>Speed of the head or foot position change</Description>
+			</Field>
+			<Field id="label1" type="label" alignWithControl="true" fontColor="darkgray" fontSize="small">
+				<Label>Select the speed at which the bed should move into the new position.</Label>
+			</Field>
+			<Field id="warning0" type="label" fontColor="red">
+				<Label>WARNING:</Label>
+			</Field>
+			<Field id="warning1" type="label" fontColor="darkgray" fontSize="small">
+				<Label>BE SURE no animals or children are under the bed when making changes to the  head or foot position on the bed. Serious injuries (or death, especially with small animals) can result if they get caught in the mechanism while it is moving.
+				</Label>
+			</Field>
+			<Field id="description" type="textfield" hidden="true">
+				<Label></Label>
+			</Field>
+		</ConfigUI>
+	</Action>
+	
+	<Action id="selectFlexFitPreset" deviceFilter="self">
+		<Name>Select FlexFit Preset</Name>
+		<CallbackMethod>selectFlexFitPreset</CallbackMethod>
+		<ConfigUI>
+			<Field id="side" type="menu" defaultValue="L">
+				<Label>Side:</Label>
+				<List>
+					<Option value="L">Left</Option>
+					<Option value="R">Right</Option>
+				</List>
+				<Description>Side of the bed</Description>
+			</Field>
+			<Field id="FlexFitPreset" type="menu" defaultValue="1">
+				<Label>FlexFit Preset:</Label>
+				<List>
+					<Option value="1">Favorite</Option>
+					<Option value="2">Read</Option>
+					<Option value="3">Watch TV</Option>
+					<Option value="4">Flat</Option>
+					<Option value="5">Zero G</Option>
+					<Option value="6">Snore</Option>
+				</List>
+				<Description>FlexFit Preset</Description>
+			</Field>
+			<Field id="label0" type="label" alignWithControl="true" fontColor="darkgray" fontSize="small">
+				<Label>Select a FlexFit Preset position. "Favorite" is the custom position you've saved in your SleepNumber Bed.</Label>
+			</Field>
+			<Field id="speed" type="menu" defaultValue="0">
+				<Label>Spped:</Label>
+				<List>
+					<Option value="0">Fast</Option>
+					<Option value="1">Slow</Option>
+				</List>
+				<Description>Speed of FlexFit preset change</Description>
+			</Field>
+			<Field id="label1" type="label" alignWithControl="true" fontColor="darkgray" fontSize="small">
+				<Label>Select the speed at which the bed should apply the FlexFit Preset change.</Label>
+			</Field>
+			<Field id="warning0" type="label" fontColor="red">
+				<Label>WARNING:</Label>
+			</Field>
+			<Field id="warning1" type="label" fontColor="darkgray" fontSize="small">
+				<Label>BE SURE no animals or children are under the bed when making changes to the FlexFit base on the bed. Serious injuries (or death, especially with small animals) can result if they get caught in the mechanism while it is moving.
+				</Label>
+			</Field>
+			<Field id="description" type="textfield" hidden="true">
+				<Label></Label>
+			</Field>
+		</ConfigUI>
+	</Action>
+</Actions>

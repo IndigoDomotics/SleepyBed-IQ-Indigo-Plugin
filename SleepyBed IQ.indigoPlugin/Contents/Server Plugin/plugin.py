@@ -4,9 +4,10 @@
 # SleepyBed IQ Plugin
 #   by Nathan Sheldon
 #
-# Some code provided by Josh Nichols (https://github.com/technicalpickles)
+# Sleepyq library code by Josh Nichols (https://github.com/technicalpickles),
+# Philip Dorr (https://github.com/tagno25), et al under MIT open licence.
 #
-#	Version 1.0.0
+#	Version 1.2.2
 #
 #	See the "VERSION_HISTORY.txt" file in the same location as this plugin.py
 #	file for a complete version change history.
@@ -81,6 +82,8 @@ class Plugin(indigo.PluginBase):
 		self.debugLog(u"Starting device: " + device.name)
 		# Clear any device error states first.
 		device.setErrorStateOnServer("")
+		# Reload the device states list.
+		device.stateListOrDisplayStateIdChanged()
 
 	# Stop Devices
 	########################################
@@ -106,6 +109,7 @@ class Plugin(indigo.PluginBase):
 			
 				# Populate the beds list, including sleeper status.
 				try:
+					self.debugLog(u"runConcurrentThread: Updating beds and sleepers list.")
 					self.bedsList = self.connection.beds_with_sleeper_status()
 					if len(self.bedsList) == 0:
 						errorText = u"There are no beds associated with this SleepIQ account. This plugin only works with beds that are registered with the SleepIQ service."
@@ -161,13 +165,14 @@ class Plugin(indigo.PluginBase):
 				# Increment the loop counter.
 				loopCount += 1
 				
-				# Reset the loop counter every 40 loops (10 minutes) and clear the saved errors.
-				if loopCount > 39:
+				# Reset the loop counter every 19 loops (10 minutes) and clear the saved errors.
+				if loopCount > 19:
+					self.debugLog(u"runConcurrentThread: 10 minutes have passed. Resetting error conditions (if any).")
 					loopCount = 0
 					self.lastError = u""
 				
-				# Sleep for 15 seconds before looping again.
-				self.sleep(15)
+				# Sleep for 30 seconds before looping again.
+				self.sleep(30)
 				
 			# End while True continuous loop.
 		except self.StopThread:
@@ -367,12 +372,11 @@ class Plugin(indigo.PluginBase):
 		isError = False
 		errorsDict = indigo.Dict()
 		errorsDict['showAlertText'] = ""
-		
+
 		# Set up a local Sleepyq object with the passed username and password for account validation.
 		username = valuesDict.get('username', "")
 		password = valuesDict.get('password', "")
-		connection = Sleepyq(username, password)
-		
+
 		if username.strip() == "":
 			# The field was left blank (or had only white space in it).
 			self.debugLog(u"username \"%s\" is blank." % valuesDict['username'])
@@ -386,9 +390,10 @@ class Plugin(indigo.PluginBase):
 			isError = True
 			errorsDict['password'] = u"The \"SleepIQ Password\" field is blank. Please enter the password you use to login to the SleepIQ web site."
 			errorsDict['showAlertText'] += errorsDict['password'] + u"\n\n"
-	
+
 		# Attempt to connect to the SleepIQ service.
 		try:
+			connection = Sleepyq(username, password)
 			connected = connection.login()
 		except Exception, e:
 			isError = True
@@ -443,23 +448,42 @@ class Plugin(indigo.PluginBase):
 	def parseBedData(self):
 		# Go through the bedsList list, find associated Indigo devices and update them.
 		self.debugLog(u"parseBedData called.")
-		
-		# We'll be using the following local variables...
-		bed					= None		# Signle Bed object from the bedsList.
-		bedData				= dict()	# Dict containing data for the Bed object.
-		rightSideData		= dict()	# Dict containing data for the right side SideStatus object.
-		rightSleeperData	= dict()	# Dict containing data for the right side Sleeper object.
-		leftSideData		= dict()	# Dict containing data for the left side SideStatus object.
-		leftSleeperData		= dict()	# Dict containing data for the left side SLeeper object.
-		device				= None		# Single Indigo device object from this plugin.
-		keyValueList		= []		# List of key:value touples to be used to update device states.
-		pluginProps			= None		# Local writable copy of an Indigo device's properties.
-		anyoneInBed			= False		# Boolean of whether anyone is in bed or not.
-		everyoneInBed		= False		# Boolean of whether everyone is in bed.
 
 		if len(self.bedsList) > 0:
 			for bed in self.bedsList:
-				bedData				= bed.data
+
+				# We'll be using the following local variables...
+				bedData				= bed.data # Dict containing data for the Bed object.
+				bedBaseData			= dict()  # Dict containing data for the base of the bed.
+				bedBaseFeatureData	= dict()  # Dict containing more data for the base of the bed.
+				rightSideData		= dict()  # Dict containing data for the right side SideStatus object.
+				rightSleeperData	= dict()  # Dict containing data for the right side Sleeper object.
+				leftSideData		= dict()  # Dict containing data for the left side SideStatus object.
+				leftSleeperData		= dict()  # Dict containing data for the left side Sleeper object.
+				device				= None  # Single Indigo device object from this plugin.
+				keyValueList		= []  # List of key:value touples to be used to update device states.
+				pluginProps			= None  # Local writable copy of an Indigo device's properties.
+				anyoneInBed			= False  # Boolean of whether anyone is in bed or not.
+				everyoneInBed		= False  # Boolean of whether everyone is in bed.
+
+				if bedData.get('base', None) != None:
+					try:
+						bedBaseData			= self.connection.foundation_status(bedId=bedData.get('bedId')).data
+					except Exception, e:
+						errorText = u"Unable to obtain status information for the base of the \"" + bedData.get('name', u"(unnamed)") + "\" bed. This may be temporary. Check the bed's network connection and this server connection if the error continues. The error was: " + str(e)
+						# Only display the error if it wasn't recently shown.
+						if self.lastError != errorText:
+							self.lastError = errorText
+							self.errorLog(errorText)
+					try:
+						bedBaseFeatureData	= self.connection.foundation_features(bedId=bedData.get('bedId')).data
+					except Exception, e:
+						errorText = u"Unable to obtain features list information for the base of the \"" + bedData.get('name', u"(unnamed)") + "\" bed. This may be temporary. Check the bed's network connection and this server connection if the error continues. The error was: " + str(e)
+						# Only display the error if it wasn't recently shown.
+						if self.lastError != errorText:
+							self.lastError = errorText
+							self.errorLog(errorText)
+
 				rightSideData		= bed.right.data
 				rightSleeperData	= bed.right.sleeper.data
 				leftSideData		= bed.left.data
@@ -483,6 +507,13 @@ class Plugin(indigo.PluginBase):
 							pluginProps['accountId']			= bedData.get('accountId', "")
 							pluginProps['address']				= bedData.get('bedId', "")
 							pluginProps['base']					= bedData.get('base', "")
+							pluginProps['baseConfigured']		= bedBaseData.get('fsConfigured', False)
+							pluginProps['baseNeedsHoming']		= bedBaseData.get('fsNeedsHoming', False)
+							pluginProps['baseType']				= bedBaseData.get('fsType', "")
+							pluginProps['hasFootControl']		= bedBaseFeatureData.get('hasFootControl', False)
+							pluginProps['hasFootWarming']		= bedBaseFeatureData.get('hasFootWarming', False)
+							pluginProps['hasMassageAndLight']	= bedBaseFeatureData.get('hasMassageAndLight', False)
+							pluginProps['hasUnderbedLight']		= bedBaseFeatureData.get('hasUnderbedLight', False)
 							pluginProps['bedName']				= bedData.get('name', "")
 							pluginProps['dualSleep']			= bedData.get('dualSleep', False)
 							pluginProps['generation']			= bedData.get('generation', "")
@@ -504,6 +535,8 @@ class Plugin(indigo.PluginBase):
 							# Update the key/value list for device states.
 							keyValueList.append({'key':'leftIsInBed',		'value':leftSideData.get('isInBed', False)})
 							keyValueList.append({'key':'leftPressure',		'value':leftSideData.get('pressure', 0)})
+							keyValueList.append({'key':'leftFootPosition',	'value':int(bedBaseData.get('fsLeftFootPosition', u'00'), 16)})
+							keyValueList.append({'key':'leftHeadPosition',	'value':int(bedBaseData.get('fsLeftHeadPosition', u'00'), 16)})
 							keyValueList.append({'key':'leftSleepNumber',	'value':leftSideData.get('sleepNumber', 0)})
 							keyValueList.append({'key':'leftSleeperId',		'value':leftSleeperData.get('sleeperId', 0)})
 							keyValueList.append({'key':'leftSleeperName',	'value':leftSleeperData.get('firstName', "")})
@@ -513,6 +546,8 @@ class Plugin(indigo.PluginBase):
 							
 							keyValueList.append({'key':'rightIsInBed',		'value':rightSideData.get('isInBed', False)})
 							keyValueList.append({'key':'rightPressure',		'value':rightSideData.get('pressure', 0)})
+							keyValueList.append({'key':'rightFootPosition',	'value':int(bedBaseData.get('fsRightFootPosition', u'00'), 16)})
+							keyValueList.append({'key':'rightHeadPosition',	'value':int(bedBaseData.get('fsRightHeadPosition', u'00'), 16)})
 							keyValueList.append({'key':'rightSleepNumber',	'value':rightSideData.get('sleepNumber', 0)})
 							keyValueList.append({'key':'rightSleeperId',	'value':rightSleeperData.get('sleeperId', 0)})
 							keyValueList.append({'key':'rightSleeperName',	'value':rightSleeperData.get('firstName', "")})
@@ -539,7 +574,9 @@ class Plugin(indigo.PluginBase):
 								keyValueList.append({'key':'everyoneInBed',	'value':False})
 						
 							# Now update the device properties and states on the server.
+							self.debugLog(u"parseBedData: Setting device \"" + device.name + "\" properties to:\n" + str(pluginProps))
 							device.replacePluginPropsOnServer(pluginProps)	# Properties
+							self.debugLog(u"parseBedData: Setting device \"" + device.name + "\" states to:\n" + str(keyValueList))
 							device.updateStatesOnServer(keyValueList)		# States
 
 						# End if Indigo device is connected to this Bed device.
@@ -547,3 +584,257 @@ class Plugin(indigo.PluginBase):
 				# End loop through our own Indigo devices.
 			# End loop through Bed objects in SleepIQ account.
 		# End if Beds list is empty.
+
+	# Set SleepNumber value
+	########################################
+	def setSleepNumber(self, action):
+		self.debugLog("setSleepNumber called.")
+		try:
+			self.debugLog("action: " + str(action))
+		except Exception, e:
+			self.debugLog("(Unable to display action content due to error: " + str(e) + ")")
+		
+		# Define the device based on the deviceId in the "action" obejct.
+		device = indigo.devices[action.deviceId]
+		# "device" should be an Indigo SleepyBed IQ SleepNumber Bed device.
+		side = str(action.props.get('side', "L"))
+		# "side" should be the string "L" or "R"
+		SleepNumber = int(action.props.get('SleepNumber', -1))
+		# "SleepNumber" should be an integer from 0 to 100 and evenly divisible by 5.
+		if SleepNumber < 0 or SleepNumber > 100:
+			errorText = u"The SleepNumber \"" + str(SleepNumber) + u"\" is invalid. No action taken."
+			self.errorLog(errorText)
+		
+		bedId = device.pluginProps.get('bedId', "")
+		
+		self.connection.set_sleepnumber(side, SleepNumber, bedId)
+
+	# Select FlexFit Preset
+	########################################
+	def selectFlexFitPreset(self, action):
+		self.debugLog("selectFlexFitPreset called.")
+		try:
+			self.debugLog("action: " + str(action))
+		except Exception, e:
+			self.debugLog("(Unable to display action content due to error: " + str(e) + ")")
+
+		# Define the device based on the deviceId in the "action" obejct.
+		device = indigo.devices[action.deviceId]
+		# "device" should be an Indigo SleepyBed IQ SleepNumber Bed device.
+		side = str(action.props.get('side', "L"))
+		# "side" should be the string "L" or "R"
+		FlexFitPreset = int(action.props.get('FlexFitPreset', None))
+		# "FlexFitPreset" should be an integer from 1 to 6.
+		#   1: Favorite
+		#   2: Read
+		#   3: Watch TV
+		#   4: Flat
+		#   5: Zero G
+		#   6: Snore
+		speed = int(action.props.get('speed', 0))
+		# "speed" should be either 0 (for fast) or 1 (for slow).
+
+		bedId = device.pluginProps.get('bedId', "")
+
+		if device.pluginProps.get('base', "") != "":
+			self.connection.preset(FlexFitPreset, side, bedId, speed)
+		else:
+			errorText = u"The \"" + device.name + u"\" doesn't support that feature.  No action taken."
+			self.errorLog(errorText)
+
+
+	# Select Base Position
+	########################################
+	def setBasePosition(self, action):
+		self.debugLog("setBasePosition called.")
+		try:
+			self.debugLog("action: " + str(action))
+		except Exception, e:
+			self.debugLog("(Unable to display action content due to error: " + str(e) + ")")
+
+		# Define the device based on the deviceId in the "action" obejct.
+		device = indigo.devices[action.deviceId]
+		# "device" should be an Indigo SleepyBed IQ SleepNumber Bed device.
+		side = str(action.props.get('side', "L"))
+		# "side" should be the string "L" or "R"
+		headOrFoot = str(action.props.get('headOrFoot', "H"))
+		# "headOrFoot" should be the string "H" or "F"
+		basePosition = int(action.props.get('basePosition', None))
+		# "basePosition" should be an integer from 0 to 100.
+		speed = int(action.props.get('speed', 0))
+		# "speed" should be either 0 (for fast) or 1 (for slow).
+
+		bedId = device.pluginProps.get('bedId', "")
+
+		# Make sure the bed supports controlling what's been requested.
+		if device.pluginProps.get('base', "") != "":
+			if headOrFoot == "H" or (headOrFoot == "F" and device.pluginProps.get('hasFootControl', False)):
+				self.connection.set_foundation_position(side, headOrFoot, basePosition, bedId, speed)
+			else:
+				errorText = u"The \"" + device.name + u"\" doesn't support that feature.  No action taken."
+				self.errorLog(errorText)
+		else:
+			errorText = u"The \"" + device.name + u"\" doesn't support that feature.  No action taken."
+			self.errorLog(errorText)
+
+	# Actions Dialog
+	########################################
+	def validateActionConfigUi(self, valuesDict, typeId, deviceId):
+		self.debugLog("validateActionConfigUi called.")
+		self.debugLog("typeId: " + str(typeId) + u", deviceId: " + str(deviceId))
+		try:
+			self.debugLog("valuesDict: " + str(valuesDict))
+		except Exception, e:
+			self.debugLog("(Unable to display valuesDict due to error: " + str(e) + ")")
+		
+		device = indigo.devices[deviceId]
+		errorMsgDict = indigo.Dict()
+		descString = u""
+		
+		#
+		# Set SleepNumber
+		#
+		if typeId == "setSleepNumber":
+			try:
+				SleepNumber = int(valuesDict.get('SleepNumber', ""))
+			except ValueError:
+				errorMsgDict['SleepNumber'] = u"The SleepNumber must be a number between 0 and 100 and be a multiple of 5."
+				errorMsgDict['showAlertText'] = errorMsgDict['SleepNumber']
+				return (False, valuesDict, errorMsgDict)
+			
+			if (SleepNumber < 0) or (SleepNumber > 100):
+				errorMsgDict['SLeepNumber'] = u"The SleepNumber must be a number between 0 and 100 and be a multiple of 5."
+				errorMsgDict['showAlertText'] = errorMsgDict['SleepNumber']
+				return (False, valuesDict, errorMsgDict)
+				
+			if SleepNumber % 5 != 0:
+				errorMsgDict['SleepNumber'] = u"The SleepNumber must be a multiple of 5."
+				errorMsgDict['showAlertText'] = errorMsgDict['SleepNumber']
+				return (False, valuesDict, errorMsgDict)
+
+			side = valuesDict.get('side', "L")
+			if side == "L":
+				sideName = "Left"
+			else:
+				sideName = "Right"
+			
+			descString += u"set the " + sideName + u" side of \"" + device.name + u"\" to SleepNumber " + str(SleepNumber)
+		
+		#
+		# Select FlexFit Preset
+		#
+		if typeId == "selectFlexFitPreset":
+			# Make sure the bed supports adjusting the base position.
+			if device.pluginProps.get('base', "") == "":
+				errorMsgDict['deviceId'] = u"The selected bed doesn't have a base with adjustable height. Please select a bed with an adjustable base."
+				errorMsgDict['showAlertText'] = errorMsgDict['deviceId']
+				return (False, valuesDict, errorMsgDict)
+
+			try:
+				FlexFitPreset = int(valuesDict.get('FlexFitPreset', 1))
+				# FlexFitPreset should be an integer from 1 to 6.
+			except ValueError:
+				errorMsgDict['FlexFitPreset'] = u"Select a FlexFit Preset."
+				errorMsgDict['showAlertText'] = errorMsgDict['FlexFitPreset']
+				return (False, valuesDict, errorMsgDict)
+			
+			try:
+				speed = int(valuesDict.get('speed', 0))
+				# "speed" should be an integer of 0 or 1.
+			except ValueError:
+				errorMsgDict['speed'] = u"Select a Speed."
+				errorMsgDict['showAlertText'] = errorMsgDict['speed']
+				return (False, valuesDict, errorMsgDict)
+			
+			side = valuesDict.get('side', "L")
+			if side == "R":
+				sideName = "Right"
+			else:
+				sideName = "Left"
+			
+			if FlexFitPreset == 2:
+				FlexFitPresetName = "Read"
+			elif FlexFitPreset == 3:
+				FlexFitPresetName = "Watch TV"
+			elif FlexFitPreset == 4:
+				FlexFitPresetName = "Flat"
+			elif FlexFitPreset == 5:
+				FlexFitPresetName = "Zero G"
+			elif FlexFitPreset == 6:
+				FlexFitPresetName = "Snore"
+			else:
+				FlexFitPresetName = "Favorite"
+
+			if speed == 1:
+				speedName = u"Slow"
+			else:
+				speedName = u"Fast"
+			
+			descString += u"set the " + sideName + u" side FlexFit position of \"" + device.name + u"\" to preset " + str(FlexFitPresetName) + " at a " + str(speedName) + " speed"
+
+		#
+		# Set Base Position
+		#
+		if typeId == "setBasePosition":
+			# Make sure the bed supports adjusting the base position.
+			if device.pluginProps.get('base', "") == "":
+				errorMsgDict['deviceId'] = u"The selected bed doesn't have a base with adjustable height. Please select a bed with an adjustable base."
+				errorMsgDict['showAlertText'] = errorMsgDict['deviceId']
+				return (False, valuesDict, errorMsgDict)
+
+			try:
+				basePosition = int(valuesDict.get('basePosition', 0))
+				# basePosition should be an integer from 0 (flat) to 100 (fully raised).
+			except ValueError:
+				errorMsgDict['basePosition'] = u"Set the Percent Raised between 0 (flat) and 100 (fully raised)."
+				errorMsgDict['showAlertText'] = errorMsgDict['basePosition']
+				return (False, valuesDict, errorMsgDict)
+
+			try:
+				speed = int(valuesDict.get('speed', 0))
+				# "speed" should be an integer of 0 or 1.
+			except ValueError:
+				errorMsgDict['speed'] = u"Select a Speed."
+				errorMsgDict['showAlertText'] = errorMsgDict['speed']
+				return (False, valuesDict, errorMsgDict)
+
+			side = valuesDict.get('side', "L")
+			if side == "R":
+				sideName = "Right"
+			else:
+				sideName = "Left"
+
+			headOrFoot = valuesDict.get('headOrFoot', "H")
+			if headOrFoot == "F":
+				headOrFootName = "Foot"
+				# Make sure the base of the bed has an adjustable foot.
+				if not device.pluginProps.get('hasFootControl', False):
+					errorMsgDict['headOrFoot'] = u"The selected bed has a base that does not support foot adjustments. Either select \"Head\" for the \"Head or Foot\" control, or select a bed whose base has adjustable foot controls."
+					errorMsgDict['showAlertText'] = errorMsgDict['headOrFoot']
+					return (False, valuesDict, errorMsgDict)
+			else:
+				headOrFootName = "Head"
+
+			# Constrain the base position value to between 0 and 100 and make sure it's a whole number.
+			if basePosition < 0:
+				basePosition = 0
+			elif basePosition > 100:
+				basePosition = 100
+			else:
+				try:
+					basePosition = int(basePosition)
+				except Exception, e:
+					errorMsgDict['basePosition'] = u"Percent Raised can only be a number between 0 and 100."
+					errorMsgDict['showAlertText'] = errorMsgDict['basePosition']
+					return (False, valuesDict, errorMsgDict)
+
+			if speed == 0:
+				speedName = u"Fast"
+			elif speed == 1:
+				speedName = u"Slow"
+
+			descString += u"set the " + sideName + u" side " + headOrFootName + u" position of \"" + device.name + u"\" to " + str(basePosition) + " at a " + str(speedName) + " speed"
+
+		valuesDict['description'] = descString
+		return (True, valuesDict)
+

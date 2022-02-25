@@ -1,6 +1,23 @@
 SLEEPYBED IQ INDIGO PLUGIN VERSION HISTORY
 ==========================================
 
+1.2.2
+* Improved compatibility with SleepNumber API service that reduces the number of calls made to the service. This may reduce or eliminate bed data gathering errors in the Indigo log.
+--
+1.2.1
+* Fixed a bug where trying to set the SleepNumber would fail with an error.
+* Fixed a bug where trying to set a FlexFit preset would fail with an error.
+* Fixed a bug that would produce 404 errors in the log if a bed had no adjustable base.
+--
+1.2.0
+* Updated Sleep IQ API library to support changes in the Sleep IQ API.
+* Added states for separate left and right side head and foot base position values.
+* Added action to set the foot and head parts of supported bed bases to precise positions.
+--
+1.1.0
+* Added ability to control SleepNumber and FlexFit adjustable base preset position.
+* Added more detailed debugging information when debug logging is enabled.
+--
 1.0.0
 * Initial release.  Supports SleepNumber beds in the SleepIQ online sleep tracking system.
 --

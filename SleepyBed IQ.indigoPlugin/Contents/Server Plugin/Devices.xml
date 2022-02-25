@@ -6,6 +6,9 @@
 			<Field id="accountId" type="textfield" hidden="true" defaultValue="" />
 			<Field id="address" type="textfield" hidden="true" defaultValue="" />
 			<Field id="base" type="textfield" hidden="true" defaultValue="" />
+			<Field id="baseConfigured" type="checkbox" hidden="true" defaultValue="false" />
+			<Field id="baseNeedsHoming" type="checkbox" hidden="true" defaultValue="false" />
+			<Field id="baseType" type="textfield" hidden="true" defaultValue="" />
 			<Field id="bedId" type="menu"
 				tooltip="Select a SleepNumber Bed">
 				<Label>SleepNumber Bed:</Label>
@@ -15,6 +18,10 @@
 			<Field id="dualSleep" type="checkbox" hidden="true" defaultValue="false" />
 			<Field id="generation" type="textfield" hidden="true" defaultValue="" />
 			<Field id="isKidsBed" type="checkbox" hidden="true" defaultValue="false" />
+			<Field id="hasFootControl" type="checkbox" hidden="true" defaultValue="false" />
+			<Field id="hasFootWarming" type="checkbox" hidden="true" defaultValue="false" />
+			<Field id="hasMassageAndLight" type="checkbox" hidden="true" defaultValue="false" />
+			<Field id="hasUnderbedLight" type="checkbox" hidden="true" defaultValue="false" />
 			<Field id="macAddress" type="textfield" hidden="true" defaultValue="" />
 			<Field id="model" type="textfield" hidden="true" defaultValue="" />
 			<Field id="purchaseDate" type="textfield" hidden="true" defaultValue="" />
@@ -66,6 +73,26 @@
 				<ValueType>Integer</ValueType>
 				<TriggerLabel>Right Side Pressure</TriggerLabel>
 				<ControlPageLabel>Right Side Pressure</ControlPageLabel>
+			</State>
+			<State id="leftFootPosition">
+				<ValueType>Integer</ValueType>
+				<TriggerLabel>Left Side Foot Position</TriggerLabel>
+				<ControlPageLabel>Left Side Foot Position</ControlPageLabel>
+			</State>
+			<State id="rightFootPosition">
+				<ValueType>Integer</ValueType>
+				<TriggerLabel>Right Side Foot Position</TriggerLabel>
+				<ControlPageLabel>Right Side Foot Position</ControlPageLabel>
+			</State>
+			<State id="leftHeadPosition">
+				<ValueType>Integer</ValueType>
+				<TriggerLabel>Left Side Head Position</TriggerLabel>
+				<ControlPageLabel>Left Side Head Position</ControlPageLabel>
+			</State>
+			<State id="rightHeadPosition">
+				<ValueType>Integer</ValueType>
+				<TriggerLabel>Right Side Head Position</TriggerLabel>
+				<ControlPageLabel>Right Side Head Position</ControlPageLabel>
 			</State>
 			<State id="leftSleepNumber">
 				<ValueType>Integer</ValueType>
