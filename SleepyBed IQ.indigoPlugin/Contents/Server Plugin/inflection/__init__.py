@@ -5,14 +5,14 @@
 
     A port of Ruby on Rails' inflector to Python.
 
-    :copyright: (c) 2012-2015 by Janne Vanhala
+    :copyright: (c) 2012-2020 by Janne Vanhala
 
     :license: MIT, see LICENSE for more details.
 """
 import re
 import unicodedata
 
-__version__ = '0.3.1'
+__version__ = '0.5.1'
 
 PLURALS = [
     (r"(?i)(quiz)$", r'\1zes'),
@@ -20,6 +20,7 @@ PLURALS = [
     (r"(?i)^(ox)$", r'\1en'),
     (r"(?i)(m|l)ice$", r'\1ice'),
     (r"(?i)(m|l)ouse$", r'\1ice'),
+    (r"(?i)(passer)s?by$", r'\1sby'),
     (r"(?i)(matr|vert|ind)(?:ix|ex)$", r'\1ices'),
     (r"(?i)(x|ch|ss|sh)$", r'\1es'),
     (r"(?i)([^aeiouy]|qu)y$", r'\1ies'),
@@ -44,6 +45,7 @@ SINGULARS = [
     (r"(?i)(quiz)zes$", r'\1'),
     (r"(?i)(matr)ices$", r'\1ix'),
     (r"(?i)(vert|ind)ices$", r'\1ex'),
+    (r"(?i)(passer)sby$", r'\1by'),
     (r"(?i)^(ox)en", r'\1'),
     (r"(?i)(alias|status)(es)?$", r'\1'),
     (r"(?i)(octop|vir)(us|i)$", r'\1us'),
@@ -74,7 +76,7 @@ SINGULARS = [
     (r"(?i)s$", ''),
 ]
 
-UNCOUNTABLES = set([
+UNCOUNTABLES = {
     'equipment',
     'fish',
     'information',
@@ -83,11 +85,10 @@ UNCOUNTABLES = set([
     'rice',
     'series',
     'sheep',
-    'species',
-])
+    'species'}
 
 
-def _irregular(singular, plural):
+def _irregular(singular: str, plural: str) -> None:
     """
     A convenience function to add appropriate rules to plurals and singular
     for irregular words.
@@ -95,65 +96,67 @@ def _irregular(singular, plural):
     :param singular: irregular word in singular form
     :param plural: irregular word in plural form
     """
-    def caseinsensitive(string):
+    def caseinsensitive(string: str) -> str:
         return ''.join('[' + char + char.upper() + ']' for char in string)
 
     if singular[0].upper() == plural[0].upper():
         PLURALS.insert(0, (
-            r"(?i)(%s)%s$" % (singular[0], singular[1:]),
+            r"(?i)({}){}$".format(singular[0], singular[1:]),
             r'\1' + plural[1:]
         ))
         PLURALS.insert(0, (
-            r"(?i)(%s)%s$" % (plural[0], plural[1:]),
+            r"(?i)({}){}$".format(plural[0], plural[1:]),
             r'\1' + plural[1:]
         ))
         SINGULARS.insert(0, (
-            r"(?i)(%s)%s$" % (plural[0], plural[1:]),
+            r"(?i)({}){}$".format(plural[0], plural[1:]),
             r'\1' + singular[1:]
         ))
     else:
         PLURALS.insert(0, (
-            r"%s%s$" % (singular[0].upper(), caseinsensitive(singular[1:])),
+            r"{}{}$".format(singular[0].upper(),
+                            caseinsensitive(singular[1:])),
             plural[0].upper() + plural[1:]
         ))
         PLURALS.insert(0, (
-            r"%s%s$" % (singular[0].lower(), caseinsensitive(singular[1:])),
+            r"{}{}$".format(singular[0].lower(),
+                            caseinsensitive(singular[1:])),
             plural[0].lower() + plural[1:]
         ))
         PLURALS.insert(0, (
-            r"%s%s$" % (plural[0].upper(), caseinsensitive(plural[1:])),
+            r"{}{}$".format(plural[0].upper(), caseinsensitive(plural[1:])),
             plural[0].upper() + plural[1:]
         ))
         PLURALS.insert(0, (
-            r"%s%s$" % (plural[0].lower(), caseinsensitive(plural[1:])),
+            r"{}{}$".format(plural[0].lower(), caseinsensitive(plural[1:])),
             plural[0].lower() + plural[1:]
         ))
         SINGULARS.insert(0, (
-            r"%s%s$" % (plural[0].upper(), caseinsensitive(plural[1:])),
+            r"{}{}$".format(plural[0].upper(), caseinsensitive(plural[1:])),
             singular[0].upper() + singular[1:]
         ))
         SINGULARS.insert(0, (
-            r"%s%s$" % (plural[0].lower(), caseinsensitive(plural[1:])),
+            r"{}{}$".format(plural[0].lower(), caseinsensitive(plural[1:])),
             singular[0].lower() + singular[1:]
         ))
 
 
-def camelize(string, uppercase_first_letter=True):
+def camelize(string: str, uppercase_first_letter: bool = True) -> str:
     """
     Convert strings to CamelCase.
 
     Examples::
 
         >>> camelize("device_type")
-        "DeviceType"
+        'DeviceType'
         >>> camelize("device_type", False)
-        "deviceType"
+        'deviceType'
 
-    :func:`camelize` can be though as a inverse of :func:`underscore`, although
-    there are some cases where that does not hold::
+    :func:`camelize` can be thought of as a inverse of :func:`underscore`,
+    although there are some cases where that does not hold::
 
         >>> camelize(underscore("IOError"))
-        "IoError"
+        'IoError'
 
     :param uppercase_first_letter: if set to `True` :func:`camelize` converts
         strings to UpperCamelCase. If set to `False` :func:`camelize` produces
@@ -165,19 +168,19 @@ def camelize(string, uppercase_first_letter=True):
         return string[0].lower() + camelize(string)[1:]
 
 
-def dasherize(word):
+def dasherize(word: str) -> str:
     """Replace underscores with dashes in the string.
 
     Example::
 
         >>> dasherize("puni_puni")
-        "puni-puni"
+        'puni-puni'
 
     """
     return word.replace('_', '-')
 
 
-def humanize(word):
+def humanize(word: str) -> str:
     """
     Capitalize the first word and turn underscores into spaces and strip a
     trailing ``"_id"``, if any. Like :func:`titleize`, this is meant for
@@ -186,9 +189,9 @@ def humanize(word):
     Examples::
 
         >>> humanize("employee_salary")
-        "Employee salary"
+        'Employee salary'
         >>> humanize("author_id")
-        "Author"
+        'Author'
 
     """
     word = re.sub(r"_id$", "", word)
@@ -198,7 +201,7 @@ def humanize(word):
     return word
 
 
-def ordinal(number):
+def ordinal(number: int) -> str:
     """
     Return the suffix that should be added to a number to denote the position
     in an ordered sequence such as 1st, 2nd, 3rd, 4th.
@@ -206,17 +209,17 @@ def ordinal(number):
     Examples::
 
         >>> ordinal(1)
-        "st"
+        'st'
         >>> ordinal(2)
-        "nd"
+        'nd'
         >>> ordinal(1002)
-        "nd"
+        'nd'
         >>> ordinal(1003)
-        "rd"
+        'rd'
         >>> ordinal(-11)
-        "th"
+        'th'
         >>> ordinal(-1021)
-        "st"
+        'st'
 
     """
     number = abs(int(number))
@@ -230,7 +233,7 @@ def ordinal(number):
         }.get(number % 10, "th")
 
 
-def ordinalize(number):
+def ordinalize(number: int) -> str:
     """
     Turn a number into an ordinal string used to denote the position in an
     ordered sequence such as 1st, 2nd, 3rd, 4th.
@@ -238,23 +241,23 @@ def ordinalize(number):
     Examples::
 
         >>> ordinalize(1)
-        "1st"
+        '1st'
         >>> ordinalize(2)
-        "2nd"
+        '2nd'
         >>> ordinalize(1002)
-        "1002nd"
+        '1002nd'
         >>> ordinalize(1003)
-        "1003rd"
+        '1003rd'
         >>> ordinalize(-11)
-        "-11th"
+        '-11th'
         >>> ordinalize(-1021)
-        "-1021st"
+        '-1021st'
 
     """
-    return "%s%s" % (number, ordinal(number))
+    return "{}{}".format(number, ordinal(number))
 
 
-def parameterize(string, separator='-'):
+def parameterize(string: str, separator: str = '-') -> str:
     """
     Replace special characters in a string so that it may be used as part of a
     'pretty' URL.
@@ -273,25 +276,25 @@ def parameterize(string, separator='-'):
         # No more than one of the separator in a row.
         string = re.sub(r'%s{2,}' % re_sep, separator, string)
         # Remove leading/trailing separator.
-        string = re.sub(r"(?i)^%(sep)s|%(sep)s$" % {'sep': re_sep}, '', string)
+        string = re.sub(r"(?i)^{sep}|{sep}$".format(sep=re_sep), '', string)
 
     return string.lower()
 
 
-def pluralize(word):
+def pluralize(word: str) -> str:
     """
     Return the plural form of a word.
 
     Examples::
 
-        >>> pluralize("post")
-        "posts"
+        >>> pluralize("posts")
+        'posts'
         >>> pluralize("octopus")
-        "octopi"
+        'octopi'
         >>> pluralize("sheep")
-        "sheep"
+        'sheep'
         >>> pluralize("CamelOctopus")
-        "CamelOctopi"
+        'CamelOctopi'
 
     """
     if not word or word.lower() in UNCOUNTABLES:
@@ -303,22 +306,22 @@ def pluralize(word):
         return word
 
 
-def singularize(word):
+def singularize(word: str) -> str:
     """
     Return the singular form of a word, the reverse of :func:`pluralize`.
 
     Examples::
 
         >>> singularize("posts")
-        "post"
+        'post'
         >>> singularize("octopi")
-        "octopus"
+        'octopus'
         >>> singularize("sheep")
-        "sheep"
+        'sheep'
         >>> singularize("word")
-        "word"
+        'word'
         >>> singularize("CamelOctopi")
-        "CamelOctopus"
+        'CamelOctopus'
 
     """
     for inflection in UNCOUNTABLES:
@@ -331,7 +334,7 @@ def singularize(word):
     return word
 
 
-def tableize(word):
+def tableize(word: str) -> str:
     """
     Create the name of a table like Rails does for models to table names. This
     method uses the :func:`pluralize` method on the last word in the string.
@@ -339,16 +342,16 @@ def tableize(word):
     Examples::
 
         >>> tableize('RawScaledScorer')
-        "raw_scaled_scorers"
+        'raw_scaled_scorers'
         >>> tableize('egg_and_ham')
-        "egg_and_hams"
+        'egg_and_hams'
         >>> tableize('fancyCategory')
-        "fancy_categories"
+        'fancy_categories'
     """
     return pluralize(underscore(word))
 
 
-def titleize(word):
+def titleize(word: str) -> str:
     """
     Capitalize all the words and replace some characters in the string to
     create a nicer looking title. :func:`titleize` is meant for creating pretty
@@ -357,23 +360,23 @@ def titleize(word):
     Examples::
 
       >>> titleize("man from the boondocks")
-      "Man From The Boondocks"
+      'Man From The Boondocks'
       >>> titleize("x-men: the last stand")
-      "X Men: The Last Stand"
+      'X Men: The Last Stand'
       >>> titleize("TheManWithoutAPast")
-      "The Man Without A Past"
+      'The Man Without A Past'
       >>> titleize("raiders_of_the_lost_ark")
-      "Raiders Of The Lost Ark"
+      'Raiders Of The Lost Ark'
 
     """
     return re.sub(
-        r"\b('?[a-z])",
+        r"\b('?\w)",
         lambda match: match.group(1).capitalize(),
-        humanize(underscore(word))
+        humanize(underscore(word)).title()
     )
 
 
-def transliterate(string):
+def transliterate(string: str) -> str:
     """
     Replace non-ASCII characters with an ASCII approximation. If no
     approximation exists, the non-ASCII character is ignored. The string must
@@ -381,30 +384,30 @@ def transliterate(string):
 
     Examples::
 
-        >>> transliterate(u'älämölö')
-        u'alamolo'
-        >>> transliterate(u'Ærøskøbing')
-        u'rskbing'
+        >>> transliterate('älämölö')
+        'alamolo'
+        >>> transliterate('Ærøskøbing')
+        'rskbing'
 
     """
     normalized = unicodedata.normalize('NFKD', string)
     return normalized.encode('ascii', 'ignore').decode('ascii')
 
 
-def underscore(word):
+def underscore(word: str) -> str:
     """
     Make an underscored, lowercase form from the expression in the string.
 
     Example::
 
         >>> underscore("DeviceType")
-        "device_type"
+        'device_type'
 
     As a rule of thumb you can think of :func:`underscore` as the inverse of
     :func:`camelize`, though there are cases where that does not hold::
 
         >>> camelize(underscore("IOError"))
-        "IoError"
+        'IoError'
 
     """
     word = re.sub(r"([A-Z]+)([A-Z][a-z])", r'\1_\2', word)

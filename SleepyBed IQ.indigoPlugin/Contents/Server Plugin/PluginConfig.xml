@@ -43,39 +43,30 @@
 	<Field id="accountVerifiedTextFalse" type="label" alignWithControl="true" fontSize="small" fontColor="red" visibleBindingId="accountVerified" visibleBindingValue="false">
 		<Label>FAILED</Label>
 	</Field>
-	<Field id="sep0" type="separator"/>
-	<Field id="updaterEmailsEnabled" type="checkbox" defaultValue="true"
-		tooltip="If you'd like to be notified via email when new versions of the Hue Lights plugin become available, enable this option.">
-		<Label>Enable Plugin Update Notifications:</Label>
+	<Field id="sep2" type="separator"/>
+	<Field id="instructions0" type="label" fontColor="black" fontSize="small">
+		<Label>INSTRUCTION:</Label>
 	</Field>
-	<Field id="noticeLabel" type="label" fontSize="small" fontColor="darkgray">
-		<Label>If you'd like to be notified via email when new versions of the Hue Lights plugin become available, enable this option.</Label>
+	<Field id="instructions1" type="label" fontColor="darkgray" fontSize="small">
+		<Label>This plugin requires that your SleepNumber bed be equipped with the SleepIQ feature, that the bed is connected to the SleepIQ web site and that you have an active account on the SleepIQ web site.</Label>
 	</Field>
-	<Field id="updaterEmail" type="textfield" visibleBindingId="updaterEmailsEnabled" visibleBindingValue="true"
-		tooltip="Enter the email address at which you'd like to be notified of plugin version updates.">
-		<Label>Email Address:</Label>
-	</Field>
-	<Field id="emailLabel" type="label" alignWithControl="true" fontSize="small" fontColor="darkgray" visibleBindingId="updaterEmailsEnabled" visibleBindingValue="true">
-		<Label>Enter the email address at which you'd like to be notified of plugin version updates.</Label>
+	<Field id="instructions2" type="label" fontColor="darkgray" fontSize="small">
+		<Label>Enter your SleepIQ username (which is usually your email address) in the "SleepIQ Username/Email" field then enter the password for that account in the "SleepIQ Password" field.  Click the Verify Login button to check if the username and password are working.  If they are, click the "Save" button below.</Label>
 	</Field>
 	<Field id="sep1" type="separator"/>
 	<Field id="debugLabel" type="label" fontColor="darkgray" fontSize="small">
 		<Label>If you are having problems with the plugin (or you are instructed by support), you can enable extra logging in the Event Log window by checking this button. Use with caution.
 		</Label>
 	</Field>
-	<Field id="showDebugInfo" type="checkbox"
-		tooltip="Enable debug logging in the Indigo log to view low level Hue Lights activity or if required for technical support. WARNING: There will be a lot of data. Don't leave debug logging enabled for too long.">
-		<Label>Enable debugging:</Label>
-		<Description>(not recommended)</Description>
-	</Field>
-	<Field id="sep2" type="separator"/>
-	<Field id="instructions0" type="label" fontColor="black" fontSize="small">
-		<Label>INSTRUCTION:</Label>
-	</Field>
-	<Field id="instructions1" type="label" fontColor="darkgray" fontSize="small">
-		<Label>This plugin requires that your SleepNumber bed be equiped with the SleepIQ feature, that the bed is connected to the SleepIQ web site and that you have an active account on the SleepIQ web site.</Label>
-	</Field>
-	<Field id="instructions2" type="label" fontColor="darkgray" fontSize="small">
-		<Label>Enter your SleepIQ username (which is usually your email address) in the "SleepIQ Username/Email" field then enter the password for that account in the "SleepIQ Password" field.  Click the Verify Login button to check if the username and password are working.  If they are, click the "Save" button below.</Label>
-	</Field>
+	<Field id="logLevel" type="menu" defaultValue="20">
+        <Label>Event Logging Level:</Label>
+        <List>
+            <Option value="5">Extra Debugging Messages</Option>
+            <Option value="10">Debugging Messages</Option>
+            <Option value="20">Informational Messages</Option>
+            <Option value="30">Warning Messages</Option>
+            <Option value="40">Error Messages</Option>
+            <Option value="50">Critical Errors Only</Option>
+        </List>
+    </Field>
 </PluginConfig>
