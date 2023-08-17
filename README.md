@@ -1,9 +1,3 @@
-SleepyBed IQ 1.0.0
-
-
-(FREE Indigo 7 Plugin)
-
-
 SleepyBed IQ is a plugin for Indigo Domotics's Indigo 7 home control software which allows you to monitor your Select Comfort SleepNumber bed through the SleepIQ online sleep monitoring system.
 
 SleepyBed IQ offers the following features:
